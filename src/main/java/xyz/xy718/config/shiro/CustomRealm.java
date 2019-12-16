@@ -14,18 +14,19 @@ import xyz.xy718.model.Operator;
 import xyz.xy718.model.Role;
 import xyz.xy718.model.User;
 import xyz.xy718.service.LoginService;
+import xyz.xy718.service.UserService;
 
 public class CustomRealm extends AuthorizingRealm {
 
     @Autowired
-    private LoginService loginService;
+    private UserService userService;
 
     @Override
     protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principalCollection) {
         //获取登录用户名
-        String name = (String) principalCollection.getPrimaryPrincipal();
-        //根据用户名去数据库查询用户信息
-        User user = loginService.getUserByName(name);
+        User user = (User) principalCollection.getPrimaryPrincipal();
+        //根据用户名去数据库用户的角色和权限
+        String user_id = userService.getUserByID(id);
         //添加角色和权限
         SimpleAuthorizationInfo simpleAuthorizationInfo = new SimpleAuthorizationInfo();
         for (Role role : user.getRoles()) {
