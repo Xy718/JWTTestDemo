@@ -60,7 +60,8 @@ public class CustomRealm extends AuthorizingRealm {
             return null;
         }
         //获取用户信息
-        User user = (User) authenticationToken.getPrincipal();
+        String username = (String) authenticationToken.getPrincipal();
+        User user= userService.getUserByUsername(username);
         if (user == null) {
             //这里返回后会报出对应异常
             return null;

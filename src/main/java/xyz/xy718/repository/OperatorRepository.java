@@ -11,13 +11,13 @@ import xyz.xy718.model.Operator;
 @Repository
 public interface OperatorRepository extends JpaRepository<Operator, Long> {
 
-	@Query("SELECT"
+	@Query(value="SELECT"
 			+ " * "
 			+ "FROM"
 			+ " operator "
 			+ "WHERE operator.operator_id "
 			+ "IN("
 			+ "select role_operator.operator_id from role_operator where role_operator.role_id=?1"
-			+ ")")
+			+ ")",nativeQuery = true)
 	public List<Operator> findOperatorsByRole_id(int role_id);
 }

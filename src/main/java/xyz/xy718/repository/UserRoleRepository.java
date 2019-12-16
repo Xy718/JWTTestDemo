@@ -10,5 +10,5 @@ import xyz.xy718.model.UserRole;
 @Repository
 public interface UserRoleRepository extends JpaRepository<UserRole, Long>{
 
-	List<UserRole> findAllByUser_id(int user_id);
+	List<UserRole> findByUserID(int userID);
 }
