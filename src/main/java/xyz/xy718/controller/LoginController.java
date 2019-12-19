@@ -58,14 +58,14 @@ public class LoginController {
 	            String username = (String) subject.getPrincipal();
 	            User getUser=userService.getUserByUsername(username);
 	            String newToken = JwtHelper.createJWT(getUser.getUsername());
-	            response.setHeader("x-auth-token", newToken);
+	            response.setHeader("Authorization", newToken);
 	            Map<String, Object> retData=new HashMap<String,Object>();
 	            retData.put("jwt", newToken);
 	            return ResultBean.success("登录成功",retData);
 	        } catch (AuthenticationException e) { 
 	           // 如果校验失败，shiro会抛出异常，返回客户端失败
 	            logger.error("User {} login fail, Reason:{}", user.getUsername(), e.getMessage());
-	            return ResultBean.error("登陆失败,用户名或密码错误",e.getMessage());
+	            return ResultBean.error("登陆失败,用户名或密码错误");
 	        } catch (Exception e) {
 	            return ResultBean.error("500Exception:"+e.getMessage());
 	        }

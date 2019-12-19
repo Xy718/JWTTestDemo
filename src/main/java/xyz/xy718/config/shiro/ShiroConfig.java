@@ -1,5 +1,7 @@
 package xyz.xy718.config.shiro;
 
+import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.authc.credential.HashedCredentialsMatcher;
 import org.apache.shiro.mgt.SecurityManager;
 import org.apache.shiro.spring.security.interceptor.AuthorizationAttributeSourceAdvisor;
 import org.apache.shiro.spring.web.ShiroFilterFactoryBean;
@@ -8,6 +10,7 @@ import org.springframework.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreato
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
 
 import java.util.HashMap;
 import java.util.Map;
@@ -27,7 +30,15 @@ public class ShiroConfig {
     @Bean
     public CustomRealm myShiroRealm() {
         CustomRealm customRealm = new CustomRealm();
+        customRealm.setCredentialsMatcher(hashedCredentialsMatcher());
         return customRealm;
+    }
+    /**
+     * 用户名密码登录密码匹配器
+     */
+    @Bean
+    public HashedCredentialsMatcher hashedCredentialsMatcher() {
+        return new MyHashedCredentialsMatcher("md5");
     }
 
     //权限管理，配置主要是Realm的管理认证
@@ -35,6 +46,8 @@ public class ShiroConfig {
     public SecurityManager securityManager() {
         DefaultWebSecurityManager securityManager = new DefaultWebSecurityManager();
         securityManager.setRealm(myShiroRealm());
+//
+        SecurityUtils.setSecurityManager(securityManager);
         return securityManager;
     }
 

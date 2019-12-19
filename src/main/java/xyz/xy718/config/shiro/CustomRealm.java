@@ -6,10 +6,12 @@ import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.authc.SimpleAuthenticationInfo;
+import org.apache.shiro.authc.UnknownAccountException;
 import org.apache.shiro.authz.AuthorizationInfo;
 import org.apache.shiro.authz.SimpleAuthorizationInfo;
 import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.subject.PrincipalCollection;
+import org.apache.shiro.util.ByteSource;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import xyz.xy718.model.Operator;
@@ -29,7 +31,9 @@ public class CustomRealm extends AuthorizingRealm {
     @Autowired
     private OperatorService operatorService;
     
-    //授权
+    /**
+     * 授权
+     */
     @Override
     protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principalCollection) {
         //获取登录用户名
@@ -55,20 +59,20 @@ public class CustomRealm extends AuthorizingRealm {
     //认证
     @Override
     protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken authenticationToken) throws AuthenticationException {
-        //加这一步的目的是在Post请求的时候会先进认证，然后在到请求
+        //加这一步的目的是在请求的时候会先进认证，然后在到请求
         if (authenticationToken.getPrincipal() == null) {
             return null;
         }
         //获取用户信息
         String username = (String) authenticationToken.getPrincipal();
         User user= userService.getUserByUsername(username);
-        if (user == null) {
+        if (!username.equals(user.getUsername())) {
             //这里返回后会报出对应异常
-            return null;
+        	throw new UnknownAccountException();
         } else {
             //这里验证authenticationToken和simpleAuthenticationInfo的信息
-            SimpleAuthenticationInfo simpleAuthenticationInfo = new SimpleAuthenticationInfo(user.getUsername(), user.getPassword().toString(), getName());
-            return simpleAuthenticationInfo;
+            //SimpleAuthenticationInfo simpleAuthenticationInfo = new SimpleAuthenticationInfo(user.getUsername(), user.getPassword().toString(), getName());
+            return new SimpleAuthenticationInfo(user.getUsername(), user.getPassword(), ByteSource.Util.bytes(user.getSalt()), super.getName());
         }
     }
 }
